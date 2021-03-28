@@ -1,15 +1,3 @@
-/******************
- *        Goals
- *  - Store Hi Score  [ ]
- *  - Toggle Start/Restart button [ ]
- *  - Mode Button
- *        - Toggle difficulty [ ]
- *        - Display difficulty [ ]
- * 
- */
-
-
-
 // Our Initial state
 let gameState = {
 
@@ -17,9 +5,7 @@ let gameState = {
 
     playerScore: 0,
 
-    initialSpeed: 200,
-
-    difficultyMode: null,
+    initialSpeed: 175,
 
     // Initialize snake body and direction
     snake : {
@@ -52,6 +38,7 @@ function renderState() {
 
 }
 
+// Build snake
 function buildSnake() {
     
     $('#score').text( gameState.playerScore );
@@ -61,17 +48,11 @@ function buildSnake() {
     const snakeHeadX = snakeHead[0];
     const snakeHeadY = snakeHead[1];
 
-    const snakeBodyStart = gameState.snake.body[1];
-    const snakeBodyStartX = snakeBodyStart[0];
-    const snakeBodyStartY = snakeBodyStart[1];
-    console.log(snakeHead);
-    console.log(snakeBodyStart);
 
     const newSnakeHeadX = snakeHeadX + gameState.snake.nextDirection[0]
     const newSnakeHeadY = snakeHeadY + gameState.snake.nextDirection[1]
     const newSnakeHead = [ newSnakeHeadX, newSnakeHeadY ]
     
-    console.log(newSnakeHead);
 
     const snakeBody = gameState.snake.body.slice(1);
 
@@ -111,7 +92,7 @@ function buildSnake() {
         segmentElement.addClass('snake');
 
     })
-    
+    // If snake head coordinates go outside canvas then end the game
     if( newSnakeHeadX < 0 || newSnakeHeadX > 19 || newSnakeHeadY < 0 || newSnakeHeadY > 19 ){
         endGame();
     }
@@ -121,14 +102,14 @@ function buildSnake() {
 
 function showApple() {
     $('.segment').removeClass('apple');
-
+    // Give apple random coordinates within canvas
     gameState.apple.location = [Math.floor(Math.random() * 20), Math.floor(Math.random() * 20)];
     const appleLocation = gameState.apple.location;
     const snakeLocation = gameState.snake.body;
     
     const appleXCoordinate = appleLocation[0];
     const appleYCoordinate = appleLocation[1];
-  
+    // Display apple on page
     const appleElement = $(`[data-x="${appleXCoordinate}"][data-y="${appleYCoordinate}"]`);
     if (snakeLocation.indexOf(appleLocation) > -1) {
         showApple();
@@ -143,7 +124,7 @@ function showApple() {
 function removeSnake() {
     const canvasElement = $('#canvas');
     canvasElement.empty();
-
+    // Show Game Over message
     $('.message').append('Game Over');
     // Remove Snake from game board
     $('.segment').removeClass('snake');
@@ -163,17 +144,9 @@ function endGame() {
     removeApple();
     clearInterval(myTimer);
     gameState.isGameRunning = false;
-    checkRestart();
+    checkGameOver();
  }
 
-// Listeners
-function onBoardClick() {
-  // update state, maybe with another dozen or so helper functions...
-
-  renderState() // show the user the new state
-}
-
-$('.board').on('click', onBoardClick); // etc
 
 // Arrow Key listeners
 $(window).on('keydown', function(event) {
@@ -194,42 +167,24 @@ $(window).on('keydown', function(event) {
         gameState.snake.nextDirection = [0, 1]
     }
 })
-
+// Start game on button click
 $('#start').on('click', () => {
         startGame();
         gameState.isGameRunning = true;
 })
-
-function checkRestart() {
-    if( gameState.isGameRunning === false ){
-        
-        buildInitialState();
-        $('#start').on('click', () => {
-            startGame();
-            gameState.isGameRunning = true;
-        })
-    }
-}  
-
+// Define timer variable to enable clearInterval()
 let myTimer;
 
 const startGame = () => {
-
     myTimer = setInterval(tick, gameState.initialSpeed);
     return myTimer;
 }
 
 // Refresh the screen in an interval
 function tick() {
-    
     buildSnake();
     gameState.playerScore++;
 }
-
-$(window).on('keydown', function (event) {
-// Read which key was pressed and update the state accordingly
-})
-
 
 function buildInitialState() {
     renderState();
